@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -71,7 +70,7 @@ func NewRootCommand() *cobra.Command {
 		Short: "User API is a simple API that fetches user data from a database.",
 		Long: `User API is a simple API that fetches user data from a database.
 			    It demonstrates how to use cobra and viper to bind command line flags to configuration files and environment variables.
-				The command hierarchy is as follows:
+		 		The command hierarchy is as follows: 
 					- flags > environment variables > configuration files and the defaults set by the tool`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// You can bind cobra and viper in a few locations, but PersistencePreRunE on the root command works well
@@ -82,10 +81,10 @@ func NewRootCommand() *cobra.Command {
 			out := cmd.OutOrStdout()
 
 			// Print the final resolved value from binding cobra flags and viper config
-			log.Printf("AppConfig: %s\n", variables.AppConfig)
-			log.Printf("DbUsername: %s\n", variables.DbUsername)
-			log.Printf("DbPassword: REDACTED\n")
-			log.Printf("DbName: %s\n", variables.DbName)
+			fmt.Fprintf(out, "AppConfig: %s\n", variables.AppConfig)
+			fmt.Fprintf(out, "DbUsername: %s\n", variables.DbUsername)
+			fmt.Fprint(out, "DbPassword: REDACTED\n")
+			fmt.Fprintf(out, "DbName: %s\n", variables.DbName)
 		},
 	}
 
