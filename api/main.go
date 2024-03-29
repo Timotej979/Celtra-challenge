@@ -18,12 +18,6 @@ func main() {
 		log.Fatalf("Error getting environment variables: %v", err)
 	}
 
-	// Print the environment variables
-	log.Printf("AppConfig: %s\n", envVars.AppConfig)
-	log.Printf("DbUsername: %s\n", envVars.DbUsername)
-	log.Printf("DbPassword: REDACTED\n")
-	log.Printf("DbName: %s\n", envVars.DbName)
-
 	// Extract the port from cmd
 
 	app := fiber.New()
