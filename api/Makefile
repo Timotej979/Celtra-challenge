@@ -1,8 +1,8 @@
 build:
-	go build -o server main.go
+	go build -o userapi main.go
 
 run: build
-	./server
+	./userapi
 
 watch:
 	reflex -s -r '\.go$$' make run

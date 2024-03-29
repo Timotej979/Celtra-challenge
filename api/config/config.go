@@ -20,10 +20,10 @@ const (
 	// The environment variable prefix of all environment variables bound to our command line flags.
 	// Example conversion: --number -> API_NUMBER
 	envPrefix = "API"
-
-	// Replace hyphenated flag names with camelCase in the config file
-	replaceHyphenWithCamelCase = false
 )
+
+// Replace hyphenated flag names with camelCase in the config file
+var replaceHyphenWithCamelCase = false
 
 // Environment variable custom storage type
 type EnvVarStore struct {
@@ -66,12 +66,11 @@ func NewRootCommand() *cobra.Command {
 
 	// Define our command
 	rootCmd := &cobra.Command{
-		Use:   "userapi",
+		Use:   "./userapi",
 		Short: "User API is a simple API that fetches user data from a database.",
-		Long: "User API is a simple API that fetches user data from a database.\n" +
-			"It demonstrates how to use cobra and viper to bind command line flags to configuration files and environment variables.\n" +
-			"The command hierarchy is as follows:\n" +
-			"\t- flags > environment variables > configuration files and the defaults set by the tool",
+		Long: "\nUser API is a simple API that fetches user data from a database.\n" +
+			"The command argument hierarchy for running the program is as follows:\n" +
+			"\t- flags\n\t- environment variables\n\t- configuration files and the defaults set by the tool",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// You can bind cobra and viper in a few locations, but PersistencePreRunE on the root command works well
 			return initializeConfig(cmd)

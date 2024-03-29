@@ -1,1 +1,4 @@
 appConfig="dev"
+dbUsername="root"
+dbPassword="pass"
+dbName="data"

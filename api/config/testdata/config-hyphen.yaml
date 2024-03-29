@@ -1,0 +1,4 @@
+app-config: dev
+db-username: root
+db-password: pass
+db-name: data
