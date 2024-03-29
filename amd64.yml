@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  
+  # Golang API
+  api:
+    build:
+      context: ./api
+      dockerfile: amd64
+      
+    restart: always
+
+  environment:
+    - API_CONFIG=${API_CONFIG}
+    - API_DBUSERNAME=${DB_USERNAME}
+    - API_DBPASSWORD=${DB_PASSWORD}
+    - API_DBNAME=${DB_DBNAME}
+
+  networks: 
+    - server-db
+
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+    interval: 10s
+    timeout: 5s
+    retries: 5
+
+  # Postgres DB
+  db:
+    image: postgres:alpine
+    restart: always
+    
+    networks:
+      - server-db
+
+    environment: 
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DBNAME} 
+
+    # Comment out ports here if you do not want outside DB access
+    ports:
+      - ${DB_OUT_PORT}:5432
+
+    # Uncomment the following lines if you want to persist data
+    #volumes:
+    #  - ./db/data:/var/lib/postgresql/data/
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DBNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  server-db:
+    driver: bridge

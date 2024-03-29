@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -10,42 +9,66 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Modified source from "Sting of the Viper" (https://carolynvanslyck.com/blog/2020/08/sting-of-the-viper/) project for production use.
+// Why use this implementation? This implementation represents a good practice how any application should be configured for fast DevOps integration and deployment.
+
+// CLI argument parser static settings
 const (
 	// The name of our config file, without the file extension because viper supports many different config file languages.
-	defaultConfigFilename = "api-config"
+	defaultConfigFilename = "config"
 
 	// The environment variable prefix of all environment variables bound to our command line flags.
-	// For example, --number would be bound to API_NUMBER.
+	// Example conversion: --number -> API_NUMBER
 	envPrefix = "API"
 
 	// Replace hyphenated flag names with camelCase in the config file
 	replaceHyphenWithCamelCase = false
 )
 
-func main() {
+// Environment variable custom storage type
+type EnvVarStore struct {
+	AppConfig  string
+	DbUsername string
+	DbPassword string
+	DbName     string
+}
+
+// Get the root command for our CLI tool and extract the values from it.\
+func GetEnvVars() (*EnvVarStore, error) {
+	// Create the root command
 	cmd := NewRootCommand()
+
+	// Execute the command and check for errors
 	if err := cmd.Execute(); err != nil {
-		os.Exit(1)
+		return nil, err
 	}
-	return cmd
+
+	// Extract the values from the command
+	vars := &EnvVarStore{
+		AppConfig:  cmd.Flag("app-config").Value.String(),
+		DbUsername: cmd.Flag("db-username").Value.String(),
+		DbPassword: cmd.Flag("db-password").Value.String(),
+		DbName:     cmd.Flag("db-name").Value.String(),
+	}
+
+	return vars, nil
 }
 
 // Build the cobra command that handles our command line tool.
 func NewRootCommand() *cobra.Command {
-	// Store the result of binding cobra flags and viper config. In a
-	// real application these would be data structures, most likely
-	// custom structs per command. This is simplified for the demo app and is
-	// not recommended that you use one-off variables. The point is that we
-	// aren't retrieving the values directly from viper or flags, we read the values
-	// from standard Go data structures.
-	color := ""
-	number := 0
+	// Define our variables
+	variables := &EnvVarStore{
+		AppConfig:  "dev",
+		DbUsername: "Celtra",
+		DbPassword: "C3ltr4Ch4ll3ng3",
+		DbName:     "UserData",
+	}
 
 	// Define our command
 	rootCmd := &cobra.Command{
-		Use:   "stingoftheviper",
-		Short: "Cober and Viper together at last",
-		Long:  `Demonstrate how to get cobra flags to bind to viper properly`,
+		Use:   "userapi",
+		Short: "User API is a simple API that fetches user data from a database.",
+		Long:  `User API is a simple API that fetches user data from a database. It demonstrates how to use cobra and viper to bind command line flags to configuration files and environment variables. The command hierarchy is as follows: flags > environment variables > configuration files and the defaults set by the tool`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// You can bind cobra and viper in a few locations, but PersistencePreRunE on the root command works well
 			return initializeConfig(cmd)
@@ -55,14 +78,18 @@ func NewRootCommand() *cobra.Command {
 			out := cmd.OutOrStdout()
 
 			// Print the final resolved value from binding cobra flags and viper config
-			fmt.Fprintln(out, "Your favorite color is:", color)
-			fmt.Fprintln(out, "The magic number is:", number)
+			fmt.Fprintf(out, "AppConfig: %s\n", variables.AppConfig)
+			fmt.Fprintf(out, "DbUsername: %s\n", variables.DbUsername)
+			fmt.Fprint(out, "DbPassword: REDACTED\n")
+			fmt.Fprintf(out, "DbName: %s\n", variables.DbName)
 		},
 	}
 
 	// Define cobra flags, the default value has the lowest (least significant) precedence
-	rootCmd.Flags().IntVarP(&number, "number", "n", 7, "What is the magic number?")
-	rootCmd.Flags().StringVarP(&color, "favorite-color", "c", "red", "Should come from flag first, then env var STING_FAVORITE_COLOR then the config file, then the default last")
+	rootCmd.Flags().StringVarP(&variables.AppConfig, "app-config", "c", "dev", "The application configuration")
+	rootCmd.Flags().StringVarP(&variables.DbUsername, "db-username", "u", "Celtra", "The database username")
+	rootCmd.Flags().StringVarP(&variables.DbPassword, "db-password", "p", "C3ltr4Ch4ll3ng3", "The database password")
+	rootCmd.Flags().StringVarP(&variables.DbName, "db-name", "n", "UserData", "The database name")
 
 	return rootCmd
 }
