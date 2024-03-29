@@ -1,6 +1,7 @@
 package main
 
 import (
+	//"github.com/Timotej979/Celtra-challenge/api/config"
 	"github.com/gofiber/fiber/v2"
 )
 

@@ -7,3 +7,28 @@ services:
     build:
       context: ./api
       dockerfile: amd64
+
+  db:
+    image: postgres:alpine
+    restart: always
+    
+    networks:
+      - server-db-net
+
+    environment: 
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DBNAME} 
+
+    # Comment out ports here if you do not want outside DB access
+    ports:
+      - ${DB_OUT_PORT}:5432
+
+    volumes:
+      - ./db/data:/var/lib/postgresql/data/
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DBNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
