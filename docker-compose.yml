@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  
+  # Golang API
+  api:
+    build:
+      context: ./api
+      dockerfile: amd64
