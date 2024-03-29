@@ -2,7 +2,10 @@ package main
 
 import (
 	// Globally available packages
-	"log"
+	"os"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -12,11 +15,18 @@ import (
 
 func main() {
 
+	// Set up the logger
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
 	// Get the environment variables
 	envVars, err := config.GetEnvVars()
 	if err != nil {
-		log.Fatalf("Error getting environment variables: %v", err)
+		log.Fatal().Err(err).Msg("error getting environment variables")
 	}
+
+	// Print the environment variables
+	log.Info().Interface("envVars", envVars).Msg("environment variables")
 
 	// Extract the port from cmd
 
