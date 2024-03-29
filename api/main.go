@@ -15,20 +15,30 @@ import (
 
 func main() {
 
-	// Set up the logger
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-
 	// Get the environment variables
 	envVars, err := config.GetEnvVars()
 	if err != nil {
 		log.Fatal().Err(err).Msg("error getting environment variables")
 	}
 
-	// Print the environment variables
-	log.Info().Interface("envVars", envVars).Msg("environment variables")
+	// Setup the logger
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	log.Logger = log.With().Caller().Logger()
 
-	// Extract the port from cmd
+	// Set the log level
+	switch envVars.AppConfig {
+	case "dev":
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	case "prod":
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	default:
+		log.Fatal().Str("appConfig", envVars.AppConfig).Msg("invalid app config: must be 'dev' or 'prod'")
+		os.Exit(1)
+	}
+
+	// Log the environment variables
+	log.Info().Interface("envVars", envVars).Msg("environment variables")
 
 	app := fiber.New()
 
