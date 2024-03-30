@@ -109,7 +109,7 @@ func NewRootCommand() *cobra.Command {
 	// Define cobra flags, the default value has the lowest (least significant) precedence
 	rootCmd.Flags().StringVarP(&variables.AppConfig, "app-config", "c", "dev", "The application configuration")
 	rootCmd.Flags().StringVarP(&variables.DbType, "db-type", "t", "postgres", "The database type")
-	rootCmd.Flags().StringVarP(&variables.DbHost, "db-host", "h", "localhost", "The database host")
+	rootCmd.Flags().StringVarP(&variables.DbHost, "db-host", "H", "localhost", "The database host")
 	rootCmd.Flags().IntVarP(&variables.DbPort, "db-port", "P", 5432, "The database port")
 	rootCmd.Flags().StringVarP(&variables.DbUsername, "db-username", "u", "Celtra", "The database username")
 	rootCmd.Flags().StringVarP(&variables.DbPassword, "db-password", "p", "C3ltr4Ch4ll3ng3", "The database password")
