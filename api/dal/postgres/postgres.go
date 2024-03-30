@@ -49,7 +49,7 @@ func (p *PostgresDriver) Connect() error {
 		" user=" + p.DbUser +
 		" password=" + p.DbPass +
 		" dbname=" + p.DbName +
-		" sslmode=require"
+		" sslmode=disable"
 
 	// Open a connection to the database
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})

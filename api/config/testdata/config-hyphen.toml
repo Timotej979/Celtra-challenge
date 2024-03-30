@@ -4,3 +4,4 @@ db-password="pass"
 db-name="data"
 db-host="localhost"
 db-port=3306
+db-type="postgres"

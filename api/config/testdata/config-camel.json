@@ -4,5 +4,6 @@
     "dbPassword": "pass",
     "dbName": "data",
     "dbHost": "localhost",
-    "dbPort": 3306
+    "dbPort": 3306,
+    "dbType": "postgres"
 }  

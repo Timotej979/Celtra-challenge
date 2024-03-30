@@ -50,11 +50,12 @@ func TestPrecedence(t *testing.T) {
 
 				gotOutput := output.String()
 				wantOutput := "AppConfig: dev" +
+					"\nDbType: postgres" +
+					"\nDbHost: localhost" +
+					"\nDbPort: 3306" +
 					"\nDbUsername: root" +
 					"\nDbPassword: REDACTED" +
-					"\nDbName: data\n" +
-					"\nDbHost: localhost" +
-					"\nDbPort: 3306\n"
+					"\nDbName: data\n"
 
 				assert.Equal(t, wantOutput, gotOutput, "expected the output to match the configuration settings")
 			})
@@ -91,11 +92,12 @@ func TestPrecedence(t *testing.T) {
 
 				gotOutput := output.String()
 				wantOutput := "AppConfig: dev" +
+					"\nDbType: postgres" +
+					"\nDbHost: localhost" +
+					"\nDbPort: 3306" +
 					"\nDbUsername: root" +
 					"\nDbPassword: REDACTED" +
-					"\nDbName: data\n" +
-					"\nDbHost: localhost" +
-					"\nDbPort: 3306\n"
+					"\nDbName: data\n"
 
 				assert.Equal(t, wantOutput, gotOutput, "expected the output to match the configuration settings")
 			})
@@ -132,11 +134,12 @@ func TestPrecedence(t *testing.T) {
 
 				gotOutput := output.String()
 				wantOutput := "AppConfig: dev" +
+					"\nDbType: postgres" +
+					"\nDbHost: localhost" +
+					"\nDbPort: 3306" +
 					"\nDbUsername: root" +
 					"\nDbPassword: REDACTED" +
-					"\nDbName: data\n" +
-					"\nDbHost: localhost" +
-					"\nDbPort: 3306\n"
+					"\nDbName: data\n"
 
 				assert.Equal(t, wantOutput, gotOutput, "expected the output to match the configuration settings")
 			})
@@ -145,14 +148,18 @@ func TestPrecedence(t *testing.T) {
 
 	// Set arguments with an environment variable
 	t.Run("env var", func(t *testing.T) {
-		// Run API_APP_CONFIG=prod API_DB_USERNAME=admin API_DB_PASSWORD=admin API_DB_NAME=database API_DB_HOST=local-host API_DB_PORT=4406 ./userapi
+		// Run API_APP_CONFIG=prod API_DB_TYPE=mysql API_DB_HOST=local-host API_DB_PORT=4406 API_DB_USERNAME=admin API_DB_PASSWORD=admin API_DB_NAME=database ./userapi
 		os.Setenv("API_APP_CONFIG", "prod")
+		os.Setenv("API_DB_TYPE", "mysql")
+		os.Setenv("API_DB_HOST", "local-host")
+		os.Setenv("API_DB_PORT", "4406")
 		os.Setenv("API_DB_USERNAME", "admin")
 		os.Setenv("API_DB_PASSWORD", "admin")
 		os.Setenv("API_DB_NAME", "database")
-		os.Setenv("API_DB_HOST", "local-host")
-		os.Setenv("API_DB_PORT", "4406")
 		defer os.Unsetenv("API_APP_CONFIG")
+		defer os.Unsetenv("API_DB_TYPE")
+		defer os.Unsetenv("API_DB_HOST")
+		defer os.Unsetenv("API_DB_PORT")
 		defer os.Unsetenv("API_DB_USERNAME")
 		defer os.Unsetenv("API_DB_PASSWORD")
 		defer os.Unsetenv("API_DB_NAME")
@@ -164,11 +171,12 @@ func TestPrecedence(t *testing.T) {
 
 		gotOutput := output.String()
 		wantOutput := "AppConfig: prod" +
+			"\nDbType: mysql" +
+			"\nDbHost: local-host" +
+			"\nDbPort: 4406" +
 			"\nDbUsername: admin" +
 			"\nDbPassword: REDACTED" +
-			"\nDbName: database\n" +
-			"\nDbHost: local-host" +
-			"\nDbPort: 4406\n"
+			"\nDbName: database\n"
 
 		assert.Equal(t, wantOutput, gotOutput, "expected the output to match the environment variables")
 	})
@@ -179,36 +187,38 @@ func TestPrecedence(t *testing.T) {
 		cmd := NewRootCommand()
 		output := &bytes.Buffer{}
 		cmd.SetOut(output)
-		cmd.SetArgs([]string{"--app-config", "prod", "--db-username", "admin", "--db-password", "admin", "--db-name", "database", "--db-host", "local-host", "--db-port", "4406"})
+		cmd.SetArgs([]string{"--app-config", "prod", "--db-username", "admin", "--db-password", "admin", "--db-name", "database", "--db-host", "local-host", "--db-port", "4406", "--db-type", "mysql"})
 		cmd.Execute()
 
 		gotOutput := output.String()
 		wantOutput := "AppConfig: prod" +
+			"\nDbType: mysql" +
+			"\nDbHost: local-host" +
+			"\nDbPort: 4406" +
 			"\nDbUsername: admin" +
 			"\nDbPassword: REDACTED" +
-			"\nDbName: database\n" +
-			"\nDbHost: local-host" +
-			"\nDbPort: 4406\n"
+			"\nDbName: database\n"
 
 		assert.Equal(t, wantOutput, gotOutput, "expected the output to match the flag values")
 	})
 
 	// Set arguments with a shorthand flag
 	t.Run("shorthand flag", func(t *testing.T) {
-		// Run ./userapi -c prod -u admin -p admin -n database -h local-host -P 4406
+		// Run ./userapi -c prod -u admin -p admin -n database -H local-host -P 4406 -t mysql
 		cmd := NewRootCommand()
 		output := &bytes.Buffer{}
 		cmd.SetOut(output)
-		cmd.SetArgs([]string{"-c", "prod", "-u", "admin", "-p", "admin", "-n", "database", "-h", "local-host", "-P", "4406"})
+		cmd.SetArgs([]string{"-c", "prod", "-u", "admin", "-p", "admin", "-n", "database", "-H", "local-host", "-P", "4406", "-t", "mysql"})
 		cmd.Execute()
 
 		gotOutput := output.String()
 		wantOutput := "AppConfig: prod" +
+			"\nDbType: mysql" +
+			"\nDbHost: local-host" +
+			"\nDbPort: 4406" +
 			"\nDbUsername: admin" +
 			"\nDbPassword: REDACTED" +
-			"\nDbName: database\n" +
-			"\nDbHost: local-host" +
-			"\nDbPort: 4406\n"
+			"\nDbName: database\n"
 
 		assert.Equal(t, wantOutput, gotOutput, "expected the output to match the flag values")
 	})
