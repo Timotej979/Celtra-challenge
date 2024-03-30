@@ -12,8 +12,8 @@ import (
 // UserData model
 type UserData struct {
 	ID        uint   `gorm:"primaryKey"`
-	accountID string `gorm:"unique"`
-	data      string `gorm:"not null"`
+	accountID string `gorm:"column:account_id;unique"`
+	data      string `gorm:"column:data;not null"`
 }
 
 type PostgresDriver struct {
