@@ -12,12 +12,16 @@ services:
 
   environment:
     - API_CONFIG=${API_CONFIG}
+    - API_DBTYPE=postgres
+    - API_DBHOST=db
+    - API_DBPORT=5432
     - API_DBUSERNAME=${DB_USERNAME}
     - API_DBPASSWORD=${DB_PASSWORD}
     - API_DBNAME=${DB_DBNAME}
+    
 
   networks: 
-    - server-db
+    - api-db
 
   healthcheck:
     test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
@@ -31,7 +35,7 @@ services:
     restart: always
     
     networks:
-      - server-db
+      - api-db
 
     environment: 
       - POSTGRES_USER=${DB_USERNAME}
@@ -53,5 +57,5 @@ services:
       retries: 5
 
 networks:
-  server-db:
+  api-db:
     driver: bridge

@@ -52,7 +52,9 @@ func TestPrecedence(t *testing.T) {
 				wantOutput := "AppConfig: dev" +
 					"\nDbUsername: root" +
 					"\nDbPassword: REDACTED" +
-					"\nDbName: data\n"
+					"\nDbName: data\n" +
+					"\nDbHost: localhost" +
+					"\nDbPort: 3306\n"
 
 				assert.Equal(t, wantOutput, gotOutput, "expected the output to match the configuration settings")
 			})
@@ -91,7 +93,9 @@ func TestPrecedence(t *testing.T) {
 				wantOutput := "AppConfig: dev" +
 					"\nDbUsername: root" +
 					"\nDbPassword: REDACTED" +
-					"\nDbName: data\n"
+					"\nDbName: data\n" +
+					"\nDbHost: localhost" +
+					"\nDbPort: 3306\n"
 
 				assert.Equal(t, wantOutput, gotOutput, "expected the output to match the configuration settings")
 			})
@@ -130,7 +134,9 @@ func TestPrecedence(t *testing.T) {
 				wantOutput := "AppConfig: dev" +
 					"\nDbUsername: root" +
 					"\nDbPassword: REDACTED" +
-					"\nDbName: data\n"
+					"\nDbName: data\n" +
+					"\nDbHost: localhost" +
+					"\nDbPort: 3306\n"
 
 				assert.Equal(t, wantOutput, gotOutput, "expected the output to match the configuration settings")
 			})
@@ -139,11 +145,13 @@ func TestPrecedence(t *testing.T) {
 
 	// Set arguments with an environment variable
 	t.Run("env var", func(t *testing.T) {
-		// Run API_APP_CONFIG=prod API_DB_USERNAME=admin API_DB_PASSWORD=admin API_DB_NAME=database ./userapi
+		// Run API_APP_CONFIG=prod API_DB_USERNAME=admin API_DB_PASSWORD=admin API_DB_NAME=database API_DB_HOST=local-host API_DB_PORT=4406 ./userapi
 		os.Setenv("API_APP_CONFIG", "prod")
 		os.Setenv("API_DB_USERNAME", "admin")
 		os.Setenv("API_DB_PASSWORD", "admin")
 		os.Setenv("API_DB_NAME", "database")
+		os.Setenv("API_DB_HOST", "local-host")
+		os.Setenv("API_DB_PORT", "4406")
 		defer os.Unsetenv("API_APP_CONFIG")
 		defer os.Unsetenv("API_DB_USERNAME")
 		defer os.Unsetenv("API_DB_PASSWORD")
@@ -158,43 +166,49 @@ func TestPrecedence(t *testing.T) {
 		wantOutput := "AppConfig: prod" +
 			"\nDbUsername: admin" +
 			"\nDbPassword: REDACTED" +
-			"\nDbName: database\n"
+			"\nDbName: database\n" +
+			"\nDbHost: local-host" +
+			"\nDbPort: 4406\n"
 
 		assert.Equal(t, wantOutput, gotOutput, "expected the output to match the environment variables")
 	})
 
 	// Set arguments with a full flag
 	t.Run("full flag", func(t *testing.T) {
-		// Run ./userapi --app-config prod --db-username admin --db-password admin --db-name database
+		// Run ./userapi --app-config prod --db-username admin --db-password admin --db-name database --db-host local-host --db-port 4406
 		cmd := NewRootCommand()
 		output := &bytes.Buffer{}
 		cmd.SetOut(output)
-		cmd.SetArgs([]string{"--app-config", "prod", "--db-username", "admin", "--db-password", "admin", "--db-name", "database"})
+		cmd.SetArgs([]string{"--app-config", "prod", "--db-username", "admin", "--db-password", "admin", "--db-name", "database", "--db-host", "local-host", "--db-port", "4406"})
 		cmd.Execute()
 
 		gotOutput := output.String()
 		wantOutput := "AppConfig: prod" +
 			"\nDbUsername: admin" +
 			"\nDbPassword: REDACTED" +
-			"\nDbName: database\n"
+			"\nDbName: database\n" +
+			"\nDbHost: local-host" +
+			"\nDbPort: 4406\n"
 
 		assert.Equal(t, wantOutput, gotOutput, "expected the output to match the flag values")
 	})
 
 	// Set arguments with a shorthand flag
 	t.Run("shorthand flag", func(t *testing.T) {
-		// Run ./userapi -c prod -u admin -p admin -n database
+		// Run ./userapi -c prod -u admin -p admin -n database -h local-host -P 4406
 		cmd := NewRootCommand()
 		output := &bytes.Buffer{}
 		cmd.SetOut(output)
-		cmd.SetArgs([]string{"-c", "prod", "-u", "admin", "-p", "admin", "-n", "database"})
+		cmd.SetArgs([]string{"-c", "prod", "-u", "admin", "-p", "admin", "-n", "database", "-h", "local-host", "-P", "4406"})
 		cmd.Execute()
 
 		gotOutput := output.String()
 		wantOutput := "AppConfig: prod" +
 			"\nDbUsername: admin" +
 			"\nDbPassword: REDACTED" +
-			"\nDbName: database\n"
+			"\nDbName: database\n" +
+			"\nDbHost: local-host" +
+			"\nDbPort: 4406\n"
 
 		assert.Equal(t, wantOutput, gotOutput, "expected the output to match the flag values")
 	})

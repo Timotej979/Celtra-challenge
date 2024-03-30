@@ -2,5 +2,7 @@
     "app-config": "dev",
     "db-username": "root",
     "db-password": "pass",
-    "db-name": "data"
+    "db-name": "data",
+    "db-host": "localhost",
+    "db-port": 3306
 }  

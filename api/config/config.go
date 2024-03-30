@@ -28,6 +28,9 @@ var replaceHyphenWithCamelCase = false
 // Environment variable custom storage type
 type EnvVarStore struct {
 	AppConfig  string
+	DbType     string
+	DbHost     string
+	DbPort     int
 	DbUsername string
 	DbPassword string
 	DbName     string
@@ -43,12 +46,21 @@ func GetEnvVars() (*EnvVarStore, error) {
 		return nil, err
 	}
 
-	// Extract the values from the command
+	// Extract the integer values from the command
+	port, err := cmd.Flags().GetInt("db-port")
+	if err != nil {
+		return nil, err
+	}
+
+	// Extract the string values from the command
 	vars := &EnvVarStore{
 		AppConfig:  cmd.Flag("app-config").Value.String(),
+		DbType:     cmd.Flag("db-type").Value.String(),
 		DbUsername: cmd.Flag("db-username").Value.String(),
 		DbPassword: cmd.Flag("db-password").Value.String(),
 		DbName:     cmd.Flag("db-name").Value.String(),
+		DbHost:     cmd.Flag("db-host").Value.String(),
+		DbPort:     port,
 	}
 
 	return vars, nil
@@ -59,9 +71,12 @@ func NewRootCommand() *cobra.Command {
 	// Define our variables
 	variables := &EnvVarStore{
 		AppConfig:  "dev",
+		DbType:     "postgres",
 		DbUsername: "Celtra",
 		DbPassword: "C3ltr4Ch4ll3ng3",
 		DbName:     "UserData",
+		DbHost:     "localhost",
+		DbPort:     5432,
 	}
 
 	// Define our command
@@ -81,14 +96,21 @@ func NewRootCommand() *cobra.Command {
 
 			// Print the final resolved value from binding cobra flags and viper config
 			fmt.Fprintf(out, "AppConfig: %s\n", variables.AppConfig)
+			fmt.Fprintf(out, "DbType: %s\n", variables.DbType)
+			fmt.Fprintf(out, "DbHost: %s\n", variables.DbHost)
+			fmt.Fprintf(out, "DbPort: %d\n", variables.DbPort)
 			fmt.Fprintf(out, "DbUsername: %s\n", variables.DbUsername)
 			fmt.Fprint(out, "DbPassword: REDACTED\n")
 			fmt.Fprintf(out, "DbName: %s\n", variables.DbName)
+
 		},
 	}
 
 	// Define cobra flags, the default value has the lowest (least significant) precedence
 	rootCmd.Flags().StringVarP(&variables.AppConfig, "app-config", "c", "dev", "The application configuration")
+	rootCmd.Flags().StringVarP(&variables.DbType, "db-type", "t", "postgres", "The database type")
+	rootCmd.Flags().StringVarP(&variables.DbHost, "db-host", "h", "localhost", "The database host")
+	rootCmd.Flags().IntVarP(&variables.DbPort, "db-port", "P", 5432, "The database port")
 	rootCmd.Flags().StringVarP(&variables.DbUsername, "db-username", "u", "Celtra", "The database username")
 	rootCmd.Flags().StringVarP(&variables.DbPassword, "db-password", "p", "C3ltr4Ch4ll3ng3", "The database password")
 	rootCmd.Flags().StringVarP(&variables.DbName, "db-name", "n", "UserData", "The database name")

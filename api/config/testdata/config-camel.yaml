@@ -2,3 +2,5 @@ appConfig: dev
 dbUsername: root
 dbPassword: pass
 dbName: data
+dbHost: localhost
+dbPort: 3306

@@ -11,6 +11,7 @@ import (
 
 	// Locally available packages
 	"github.com/Timotej979/Celtra-challenge/api/config"
+	"github.com/Timotej979/Celtra-challenge/api/dal"
 )
 
 func main() {
@@ -39,6 +40,27 @@ func main() {
 
 	// Log the environment variables
 	log.Info().Interface("envVars", envVars).Msg("environment variables")
+
+	// Create the DALConfig
+	dalConfig := dal.DALConfig{
+		DbType: envVars.DbType,
+		DbHost: envVars.DbHost,
+		DbPort: envVars.DbPort,
+		DbUser: envVars.DbUsername,
+		DbPass: envVars.DbPassword,
+		DbName: envVars.DbName,
+	}
+
+	// Create the DAL
+	dalInstance, err := dal.NewDAL(&dalConfig)
+	if err != nil {
+		log.Fatal().Err(err).Msg("error creating DAL")
+	}
+
+	err = dalInstance.DbDriver.Connect()
+	if err != nil {
+		log.Fatal().Err(err).Msg("error connecting to the database")
+	}
 
 	app := fiber.New()
 
