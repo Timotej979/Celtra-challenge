@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"github.com/Timotej979/Celtra-challenge/api/dal/mongo"
@@ -13,12 +14,13 @@ import (
 
 // DALConfig represents the configuration for the Data Access Layer
 type DALConfig struct {
-	DbType string
-	DbHost string
-	DbPort int
-	DbUser string
-	DbPass string
-	DbName string
+	DbType   string
+	DbHost   string
+	DbPort   int
+	DbUser   string
+	DbPass   string
+	DbName   string
+	DbLogger zerolog.Logger
 }
 
 type DatabaseDriver interface {
@@ -49,11 +51,11 @@ func NewDAL(config *DALConfig) (*DAL, error) {
 	// Create the database driver
 	switch config.DbType {
 	case "postgres":
-		dal.DbDriver = postgres.NewPostgresDriver(config.DbHost, config.DbPort, config.DbUser, config.DbPass, config.DbName)
+		dal.DbDriver = postgres.NewPostgresDriver(config.DbHost, config.DbPort, config.DbUser, config.DbPass, config.DbName, config.DbLogger)
 	case "mysql":
-		dal.DbDriver = mysql.NewMySQLDriver(config.DbHost, config.DbPort, config.DbUser, config.DbPass, config.DbName)
+		dal.DbDriver = mysql.NewMySQLDriver(config.DbHost, config.DbPort, config.DbUser, config.DbPass, config.DbName, config.DbLogger)
 	case "mongo":
-		dal.DbDriver = mongo.NewMongoDBDriver(config.DbHost, config.DbPort, config.DbUser, config.DbPass, config.DbName)
+		dal.DbDriver = mongo.NewMongoDBDriver(config.DbHost, config.DbPort, config.DbUser, config.DbPass, config.DbName, config.DbLogger)
 	default:
 		err := fmt.Errorf("invalid database type: %s", config.DbType)
 		log.Error().Err(err).Msg("failed to create DAL")

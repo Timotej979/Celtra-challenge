@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -33,7 +34,10 @@ type MongoDBDriver struct {
 }
 
 // NewMongoDBDriver creates a new instance of MongoDBDriver
-func NewMongoDBDriver(host string, port int, user string, pass string, dbName string) *MongoDBDriver {
+func NewMongoDBDriver(host string, port int, user string, pass string, dbName string, logger zerolog.Logger) *MongoDBDriver {
+	// Assign the logger
+	log.Logger = logger
+
 	return &MongoDBDriver{
 		DbHost: host,
 		DbPort: port,

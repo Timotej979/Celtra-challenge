@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"gorm.io/driver/mysql"
@@ -32,7 +33,10 @@ type MySQLDriver struct {
 }
 
 // NewMySQLDriver creates a new instance of MySQLDriver
-func NewMySQLDriver(host string, port int, user string, pass string, dbName string) *MySQLDriver {
+func NewMySQLDriver(host string, port int, user string, pass string, dbName string, logger zerolog.Logger) *MySQLDriver {
+	// Assign the logger
+	log.Logger = logger
+
 	return &MySQLDriver{
 		DbHost: host,
 		DbPort: port,

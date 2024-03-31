@@ -204,7 +204,6 @@ func testMigrationAndCRUD(t *testing.T, dbType string) {
 	// Test get operation
 	retrievedData, _, err := dalInstance.DbDriver.GetUserData(accountID)
 	assert.NoError(t, err)
-	t.Logf("Retrieved data: %s", retrievedData)
 	assert.Equal(t, data, retrievedData)
 
 	// Test delete operation

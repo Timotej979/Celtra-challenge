@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"gorm.io/driver/postgres"
@@ -31,7 +32,10 @@ type PostgresDriver struct {
 }
 
 // NewPostgresDriver creates a new instance of PostgresDriver
-func NewPostgresDriver(host string, port int, user string, pass string, dbName string) *PostgresDriver {
+func NewPostgresDriver(host string, port int, user string, pass string, dbName string, logger zerolog.Logger) *PostgresDriver {
+	// Assign the logger
+	log.Logger = logger
+
 	return &PostgresDriver{
 		DbHost: host,
 		DbPort: port,
