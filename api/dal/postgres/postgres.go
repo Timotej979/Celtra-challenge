@@ -13,7 +13,7 @@ import (
 // UserData model
 type UserData struct {
 	ID        uint      `gorm:"primaryKey"`
-	AccountID string    `gorm:"column:accountid;"`
+	AccountID string    `gorm:"column:account_id;"`
 	Timestamp time.Time `gorm:"column:timestamp;"`
 	Data      string    `gorm:"column:data;"`
 }

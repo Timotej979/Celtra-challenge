@@ -1,5 +1,0 @@
-Internal: 
-    psql postgres://Celtra:C3ltr4Ch4ll3ng3@db:5432/InstagramUsersDatabase
-
-External:
-    psql postgres://Celtra:C3ltr4Ch4ll3ng3@localhost:6666/InstagramUsersDatabase

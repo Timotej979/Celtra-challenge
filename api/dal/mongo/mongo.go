@@ -14,7 +14,7 @@ import (
 // UserData model
 type UserData struct {
 	ID        uint      `bson:"_id,omitempty"`
-	AccountID string    `bson:"accountID"`
+	AccountID string    `bson:"account_id"`
 	Timestamp time.Time `bson:"timestamp"`
 	Data      string    `bson:"data"`
 }
@@ -88,7 +88,7 @@ func (m *MongoDBDriver) Migrate() error {
 	log.Info().Msg("Migrating the database schema...")
 
 	// Get the database and collection
-	collection := m.Db.Database(m.DbName).Collection("userdata")
+	collection := m.Db.Database(m.DbName).Collection("user_data")
 
 	// Insert a dummy record to create the collection
 	_, err := collection.InsertOne(context.Background(), UserData{})
@@ -104,7 +104,7 @@ func (m *MongoDBDriver) InsertUserData(accountID string, data string) error {
 	log.Info().Msg("Inserting user data record...")
 
 	// Get the database and collection
-	collection := m.Db.Database(m.DbName).Collection("userdata")
+	collection := m.Db.Database(m.DbName).Collection("user_data")
 
 	// Create the user data document
 	userData := UserData{
@@ -128,7 +128,7 @@ func (m *MongoDBDriver) GetUserData(accountID string) (string, time.Time, error)
 	var userData UserData
 
 	// Get the database and collection
-	collection := m.Db.Database(m.DbName).Collection("userdata")
+	collection := m.Db.Database(m.DbName).Collection("user_data")
 
 	// Find the user data record
 	err := collection.FindOne(context.Background(), UserData{AccountID: accountID}).Decode(&userData)
@@ -144,7 +144,7 @@ func (m *MongoDBDriver) DeleteUserData(accountID string) error {
 	log.Info().Msg("Deleting user data record...")
 
 	// Get the database and collection
-	collection := m.Db.Database(m.DbName).Collection("userdata")
+	collection := m.Db.Database(m.DbName).Collection("user_data")
 
 	// Delete the user data record
 	_, err := collection.DeleteOne(context.Background(), UserData{AccountID: accountID})
