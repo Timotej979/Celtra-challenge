@@ -57,11 +57,30 @@ func main() {
 		log.Fatal().Err(err).Msg("error creating DAL")
 	}
 
+	// Connect to the database
 	err = dalInstance.DbDriver.Connect()
 	if err != nil {
 		log.Fatal().Err(err).Msg("error connecting to the database")
 	}
 
+	// Migrate the database
+	err = dalInstance.DbDriver.Migrate()
+	if err != nil {
+		log.Fatal().Err(err).Msg("error migrating the database")
+	}
+
+	// Insert some test data
+	err = dalInstance.DbDriver.InsertUserData("test123", "test data")
+	if err != nil {
+		log.Fatal().Err(err).Msg("error inserting user data")
+	}
+
+	err = dalInstance.DbDriver.InsertUserData("test1234", "test data1")
+	if err != nil {
+		log.Fatal().Err(err).Msg("error inserting user data")
+	}
+
+	// Create the Fiber app
 	app := fiber.New()
 
 	app.Get("/healthz", func(c *fiber.Ctx) error {

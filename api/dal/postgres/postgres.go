@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/rs/zerolog/log"
 
@@ -11,9 +12,10 @@ import (
 
 // UserData model
 type UserData struct {
-	ID        uint   `gorm:"primaryKey"`
-	accountID string `gorm:"column:account_id;unique"`
-	data      string `gorm:"column:data;not null"`
+	ID        uint      `gorm:"primaryKey"`
+	AccountID string    `gorm:"column:accountid;"`
+	Timestamp time.Time `gorm:"column:timestamp;"`
+	Data      string    `gorm:"column:data;"`
 }
 
 type PostgresDriver struct {
@@ -95,8 +97,9 @@ func (p *PostgresDriver) InsertUserData(accountID string, data string) error {
 	log.Info().Msg("Inserting user data record...")
 
 	userData := UserData{
-		accountID: accountID,
-		data:      data,
+		AccountID: accountID,
+		Timestamp: time.Now(),
+		Data:      data,
 	}
 
 	// Insert the user data record
@@ -109,7 +112,7 @@ func (p *PostgresDriver) InsertUserData(accountID string, data string) error {
 }
 
 // GetUserData retrieves a user data record from the database
-func (p *PostgresDriver) GetUserData(accountID string) (string, error) {
+func (p *PostgresDriver) GetUserData(accountID string) (string, time.Time, error) {
 	log.Info().Msg("Getting user data record...")
 	var userData UserData
 
@@ -117,9 +120,9 @@ func (p *PostgresDriver) GetUserData(accountID string) (string, error) {
 	result := p.Db.Where("account_id = ?", accountID).First(&userData)
 	if result.Error != nil {
 		log.Error().Err(result.Error).Msg("Failed to get user data record")
-		return "", result.Error
+		return "", time.Time{}, result.Error
 	}
-	return userData.data, nil
+	return userData.Data, userData.Timestamp, nil
 }
 
 // DeleteUserData deletes a user data record from the database

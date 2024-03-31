@@ -2,6 +2,7 @@ package dal
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/rs/zerolog/log"
 
@@ -25,7 +26,7 @@ type DatabaseDriver interface {
 	Close() error
 	Migrate() error
 	InsertUserData(accountID string, data string) error
-	GetUserData(accountID string) (string, error)
+	GetUserData(accountID string) (string, time.Time, error)
 	DeleteUserData(accountID string) error
 }
 

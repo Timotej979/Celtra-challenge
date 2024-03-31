@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/rs/zerolog/log"
 
@@ -12,9 +13,10 @@ import (
 
 // UserData model
 type UserData struct {
-	ID        uint   `bson:"_id,omitempty"`
-	AccountID string `bson:"accountID"`
-	Data      string `bson:"data"`
+	ID        uint      `bson:"_id,omitempty"`
+	AccountID string    `bson:"accountID"`
+	Timestamp time.Time `bson:"timestamp"`
+	Data      string    `bson:"data"`
 }
 
 // MongoDBDriver represents the MongoDB database driver
@@ -89,10 +91,7 @@ func (m *MongoDBDriver) Migrate() error {
 	collection := m.Db.Database(m.DbName).Collection("userdata")
 
 	// Insert a dummy record to create the collection
-	_, err := collection.InsertOne(context.Background(), UserData{
-		AccountID: "dummy",
-		Data:      "dummy",
-	})
+	_, err := collection.InsertOne(context.Background(), UserData{})
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to migrate the database schema")
 		return err
@@ -110,6 +109,7 @@ func (m *MongoDBDriver) InsertUserData(accountID string, data string) error {
 	// Create the user data document
 	userData := UserData{
 		AccountID: accountID,
+		Timestamp: time.Now(),
 		Data:      data,
 	}
 
@@ -123,7 +123,7 @@ func (m *MongoDBDriver) InsertUserData(accountID string, data string) error {
 }
 
 // GetUserData retrieves a user data record from the database
-func (m *MongoDBDriver) GetUserData(accountID string) (string, error) {
+func (m *MongoDBDriver) GetUserData(accountID string) (string, time.Time, error) {
 	log.Info().Msg("Getting user data record...")
 	var userData UserData
 
@@ -134,9 +134,9 @@ func (m *MongoDBDriver) GetUserData(accountID string) (string, error) {
 	err := collection.FindOne(context.Background(), UserData{AccountID: accountID}).Decode(&userData)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get user data record")
-		return "", err
+		return "", time.Time{}, err
 	}
-	return userData.Data, nil
+	return userData.Data, userData.Timestamp, nil
 }
 
 // DeleteUserData deletes a user data record from the database

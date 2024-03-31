@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/rs/zerolog/log"
 
@@ -11,9 +12,10 @@ import (
 
 // UserData model
 type UserData struct {
-	ID        uint   `gorm:"primaryKey"`
-	accountID string `gorm:"unique"`
-	data      string `gorm:"not null"`
+	ID        uint      `gorm:"primaryKey"`
+	AccountID string    `gorm:"column:accountid;"`
+	Timestamp time.Time `gorm:"column:timestamp;"`
+	Data      string    `gorm:"column:data;"`
 }
 
 // MySQLDriver represents the MySQL database driver
@@ -84,8 +86,9 @@ func (m *MySQLDriver) InsertUserData(accountID string, data string) error {
 	log.Info().Msg("Inserting user data record...")
 
 	userData := UserData{
-		accountID: accountID,
-		data:      data,
+		AccountID: accountID,
+		Timestamp: time.Now(),
+		Data:      data,
 	}
 
 	// Insert the user data record
@@ -98,7 +101,7 @@ func (m *MySQLDriver) InsertUserData(accountID string, data string) error {
 }
 
 // GetUserData retrieves a user data record from the database
-func (m *MySQLDriver) GetUserData(accountID string) (string, error) {
+func (m *MySQLDriver) GetUserData(accountID string) (string, time.Time, error) {
 	log.Info().Msg("Retrieving user data record...")
 	var userData UserData
 
@@ -106,9 +109,9 @@ func (m *MySQLDriver) GetUserData(accountID string) (string, error) {
 	result := m.Db.Where("account_id = ?", accountID).First(&userData)
 	if result.Error != nil {
 		log.Error().Err(result.Error).Msg("Failed to retrieve user data record")
-		return "", result.Error
+		return "", time.Time{}, result.Error
 	}
-	return userData.data, nil
+	return userData.Data, userData.Timestamp, nil
 }
 
 // DeleteUserData deletes a user data record from the database

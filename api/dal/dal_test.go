@@ -13,6 +13,9 @@ import (
 )
 
 func TestMigrationAndCRUD(t *testing.T) {
+	// Set Ryuk timeout to 5 minutes to avoid premature container termination in debug
+	t.Setenv("TESTCONTAINERS_RYUK_TIMEOUT", "300000")
+
 	// Run tests for PostgreSQL
 	t.Run("PostgreSQL", func(t *testing.T) {
 		testMigrationAndCRUD(t, "postgres")
@@ -47,19 +50,21 @@ func testMigrationAndCRUD(t *testing.T, dbType string) {
 	default:
 		t.Fatalf("Unsupported database type: %s", dbType)
 	}
-
 	defer container.Terminate(ctx)
 
+	// Get the host of the container
 	host, err := container.Host(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// Get the port of the container
 	portInt, err := strconv.Atoi(port)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	// Create a new instance of the Data Access Layer
 	config := &dal.DALConfig{
 		DbType: dbType,
 		DbHost: host,
@@ -73,7 +78,6 @@ func testMigrationAndCRUD(t *testing.T, dbType string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer dalInstance.DbDriver.Close()
 
 	// Connect to the database
 	err = dalInstance.DbDriver.Connect()
@@ -93,7 +97,7 @@ func testMigrationAndCRUD(t *testing.T, dbType string) {
 	assert.NoError(t, err)
 
 	// Test get operation
-	retrievedData, err := dalInstance.DbDriver.GetUserData(accountID)
+	retrievedData, _, err := dalInstance.DbDriver.GetUserData(accountID)
 	assert.NoError(t, err)
 	assert.Equal(t, data, retrievedData)
 
@@ -102,7 +106,7 @@ func testMigrationAndCRUD(t *testing.T, dbType string) {
 	assert.NoError(t, err)
 
 	// Verify deletion
-	_, err = dalInstance.DbDriver.GetUserData(accountID)
+	_, _, err = dalInstance.DbDriver.GetUserData(accountID)
 	assert.Error(t, err)
 
 	// Disconnect from the database
@@ -114,13 +118,13 @@ func testMigrationAndCRUD(t *testing.T, dbType string) {
 func createPostgresContainer(ctx context.Context) (testcontainers.Container, string) {
 	req := testcontainers.ContainerRequest{
 		Image:        "postgres:alpine",
-		ExposedPorts: []string{"5432/tcp"},
+		ExposedPorts: []string{"5432"},
 		Env: map[string]string{
 			"POSTGRES_USER":     "testuser",
 			"POSTGRES_PASSWORD": "testpassword",
 			"POSTGRES_DB":       "testdb",
 		},
-		WaitingFor: wait.ForListeningPort("5432/tcp"),
+		WaitingFor: wait.ForLog("database system is ready to accept connections"),
 	}
 	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,
@@ -130,7 +134,7 @@ func createPostgresContainer(ctx context.Context) (testcontainers.Container, str
 		panic(err)
 	}
 
-	port, err := container.MappedPort(ctx, "5432/tcp")
+	port, err := container.MappedPort(ctx, "5432")
 	if err != nil {
 		panic(err)
 	}
@@ -142,13 +146,13 @@ func createPostgresContainer(ctx context.Context) (testcontainers.Container, str
 func createMongoContainer(ctx context.Context) (testcontainers.Container, string) {
 	req := testcontainers.ContainerRequest{
 		Image:        "mongo:latest",
-		ExposedPorts: []string{"27017/tcp"},
+		ExposedPorts: []string{"27017"},
 		Env: map[string]string{
 			"MONGO_INITDB_ROOT_USERNAME": "testuser",
 			"MONGO_INITDB_ROOT_PASSWORD": "testpassword",
 			"MONGO_INITDB_DATABASE":      "testdb",
 		},
-		WaitingFor: wait.ForListeningPort("27017/tcp"),
+		WaitingFor: wait.ForLog("Waiting for connections"),
 	}
 	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,
@@ -158,7 +162,7 @@ func createMongoContainer(ctx context.Context) (testcontainers.Container, string
 		panic(err)
 	}
 
-	port, err := container.MappedPort(ctx, "27017/tcp")
+	port, err := container.MappedPort(ctx, "27017")
 	if err != nil {
 		panic(err)
 	}
@@ -170,13 +174,13 @@ func createMongoContainer(ctx context.Context) (testcontainers.Container, string
 func createMySQLContainer(ctx context.Context) (testcontainers.Container, string) {
 	req := testcontainers.ContainerRequest{
 		Image:        "mysql:latest",
-		ExposedPorts: []string{"3306/tcp"},
+		ExposedPorts: []string{"3306"},
 		Env: map[string]string{
 			"MYSQL_USER":          "testuser",
 			"MYSQL_ROOT_PASSWORD": "testpassword",
 			"MYSQL_DATABASE":      "testdb",
 		},
-		WaitingFor: wait.ForListeningPort("3306/tcp"),
+		WaitingFor: wait.ForLog("port: 3306  MySQL Community Server - GPL"),
 	}
 	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,
@@ -186,7 +190,7 @@ func createMySQLContainer(ctx context.Context) (testcontainers.Container, string
 		panic(err)
 	}
 
-	port, err := container.MappedPort(ctx, "3306/tcp")
+	port, err := container.MappedPort(ctx, "3306")
 	if err != nil {
 		panic(err)
 	}
