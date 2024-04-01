@@ -31,6 +31,11 @@ jobs:
       run: cd ./api/dal &&
            go mod init github.com/Timotej979/Celtra-challenge/api/dal &&
            go get github.com/rs/zerolog &&
+           go get go.mongodb.org/mongo-driver/mongo &&
+           go get go.mongodb.org/mongo-driver/mongo/options &&
+           go get gorm.io/driver/mysql &&
+           go get gorm.io/gorm &&
+           go get gorm.io/driver/postgres
            go test
 
       
