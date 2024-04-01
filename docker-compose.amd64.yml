@@ -7,7 +7,7 @@ services:
     image: "social-media-api:amd64"
     build:
       context: ./api
-      dockerfile: amd64
+      dockerfile: Dockerfile.amd64
       
     restart: always
 
