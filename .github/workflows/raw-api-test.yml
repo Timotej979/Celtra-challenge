@@ -37,9 +37,9 @@ jobs:
            go get gorm.io/gorm &&
            go get gorm.io/driver/postgres &&
            go get github.com/mattn/go-isatty@v0.0.19 &&
-           github.com/stretchr/testify/assert &&
-           github.com/testcontainers/testcontainers-go &&
-           github.com/testcontainers/testcontainers-go/wait &&
+           go get github.com/stretchr/testify/assert &&
+           go get github.com/testcontainers/testcontainers-go &&
+           go get github.com/testcontainers/testcontainers-go/wait &&
            go test
 
       
