@@ -19,9 +19,16 @@ jobs:
         go-version: '1.21.7'
 
     - name: Test config module
-      run: cd ./api/config && go mod init github.com/Timotej979/Celtra-challenge/api/config && go test
+      run: cd ./api/config &&
+           go mod init github.com/Timotej979/Celtra-challenge/api/config &&
+           go get github.com/spf13/cobra &&
+           go get github.com/spf13/viper &&
+           go get github.com/spf13/pflag &&
+           go test
 
     - name: Test DAL module
-      run: cd ./api/dal && go mod init github.com/Timotej979/Celtra-challenge/api/dal && go test
+      run: cd ./api/dal &&
+           go mod init github.com/Timotej979/Celtra-challenge/api/dal &&
+           go test
 
       
