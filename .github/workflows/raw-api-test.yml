@@ -36,6 +36,7 @@ jobs:
            go get gorm.io/driver/mysql &&
            go get gorm.io/gorm &&
            go get gorm.io/driver/postgres &&
+           go get github.com/mattn/go-isatty@v0.0.19 &&
            go test
 
       
