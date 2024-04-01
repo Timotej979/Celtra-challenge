@@ -18,9 +18,9 @@ func SetupRoutes(router fiber.Router, dal *dal.DAL, defaultLogger zerolog.Logger
 	instagramHandlerInstance := instagramHandler.NewInstagramHandler(dal, defaultLogger)
 
 	// Health check of the Instagram API
-	instagram.Get("/healthz", instagramHandlerInstance.Healthz())
+	instagram.Get("/healthz", instagramHandlerInstance.Healthz)
 
 	// Get the Instagram user data
-	instagram.Get("/:accountID/description", instagramHandlerInstance.GetInstagramUserDescription())
+	instagram.Get("/:accountID/description", instagramHandlerInstance.GetInstagramUserDescription)
 
 }

@@ -1,6 +1,10 @@
 package instagramHandlers
 
 import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
@@ -33,7 +37,23 @@ func (h *InstagramHandler) GetInstagramUserDescription(c *fiber.Ctx) error {
 	accountID := c.Params("accountID")
 
 	// Make a web request to the Instagram API like so: https://www.instagram.com/leomessi/?__a=1&__d=dis
-	// TODO: Implement the web request to the Instagram API
+	// Make a web request to the Instagram API
+	reqURL := fmt.Sprintf("https://www.instagram.com/%s/?__a=1&__d=dis", accountID)
+	resp, err := http.Get(reqURL)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	// Print the response body
+	data := string(body)
+	log.Info().Msg("Instagram API response: " + data)
 
 	// TODO: Parse the Instagram user data
 
