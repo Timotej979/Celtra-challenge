@@ -1,0 +1,1 @@
+docker-compose -f docker-compose.amd64.yml down
