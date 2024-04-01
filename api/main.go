@@ -53,17 +53,11 @@ func main() {
 		DbLogger: log.Logger,
 	}
 
-	// Create the DAL
-	dalInstance, err := dal.NewDAL(&dalConfig)
-	if err != nil {
-		log.Fatal().Err(err).Msg("error creating DAL")
-	}
-
 	// Create the Fiber app
 	app := fiber.New()
 
 	// Setup the routes
-	router.SetupRouter(app, dalInstance, log.Logger)
+	router.SetupRouter(app, dalConfig, log.Logger)
 
 	// Start the server
 	err = app.Listen(":3000")

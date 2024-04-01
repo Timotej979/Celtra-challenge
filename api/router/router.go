@@ -8,14 +8,14 @@ import (
 	"github.com/gofiber/swagger"
 
 	"github.com/Timotej979/Celtra-challenge/api/dal"
-	instagramRoutes "github.com/Timotej979/Celtra-challenge/api/internals/routes/instagram"
+	mockRoutes "github.com/Timotej979/Celtra-challenge/api/internals/routes/mock"
 )
 
-func SetupRouter(app *fiber.App, dal *dal.DAL, defaultLogger zerolog.Logger) {
+func SetupRouter(app *fiber.App, dalConfig dal.DALConfig, defaultLogger zerolog.Logger) {
 
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
-	api := app.Group("/social-media-api/v1", logger.New())
+	api := app.Group("/mock-api/v1", logger.New())
 
-	instagramRoutes.SetupRoutes(api, dal, defaultLogger)
+	mockRoutes.SetupRoutes(api, dalConfig, defaultLogger)
 }

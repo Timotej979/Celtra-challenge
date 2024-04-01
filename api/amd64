@@ -32,6 +32,4 @@ USER appuser
 # Copy our static executable
 COPY --from=builder /go/bin/app ./app_binary
 
-EXPOSE 5000
-
 CMD ["./app_binary"]

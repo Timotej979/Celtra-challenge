@@ -4,6 +4,7 @@ services:
   
   # Golang API
   api:
+    image: "social-media-api:amd64"
     build:
       context: ./api
       dockerfile: amd64
@@ -21,12 +22,15 @@ services:
 
     networks: 
       - api-db
+      - nginx-api
 
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/social-media-api/v1/instagram/healthz"]
+      start_period: 20s
       interval: 10s
       timeout: 5s
       retries: 5
@@ -58,6 +62,38 @@ services:
       timeout: 5s
       retries: 5
 
+  # Nginx Reverse Proxy
+  nginx:
+    image: "social-media-nginx:amd64"
+    build:
+      context: ./nginx
+
+    command: sh -c "nginx -g 'daemon off;'"
+    
+    restart: always
+
+    ports:
+      - ${NGINX_OUT_PORT}:8000
+
+    networks:
+      - nginx-api
+
+    depends_on:
+      api:
+        condition: service_started
+      db:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/social-media-api/v1/instagram/healthz"]
+      start_period: 20s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
 networks:
   api-db:
+    driver: bridge
+  nginx-api:
     driver: bridge
