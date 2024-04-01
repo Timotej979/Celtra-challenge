@@ -1,0 +1,25 @@
+name: API Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Go tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.21.7'
+
+    - name: Run tests
+      run: |
+        go test ./api/config
+        go test ./api/dal
