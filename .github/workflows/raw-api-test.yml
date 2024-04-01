@@ -40,6 +40,8 @@ jobs:
            go get github.com/stretchr/testify/assert &&
            go get github.com/testcontainers/testcontainers-go &&
            go get github.com/testcontainers/testcontainers-go/wait &&
+           go get go.mongodb.org/mongo-driver/internal/aws/credentials@v1.14.0 &&
+           go get go.mongodb.org/mongo-driver/x/mongo/driver/ocsp@v1.14.0 &&
            go test
 
       
