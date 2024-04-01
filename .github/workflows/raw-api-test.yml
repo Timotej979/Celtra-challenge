@@ -35,7 +35,7 @@ jobs:
            go get go.mongodb.org/mongo-driver/mongo/options &&
            go get gorm.io/driver/mysql &&
            go get gorm.io/gorm &&
-           go get gorm.io/driver/postgres
+           go get gorm.io/driver/postgres &&
            go test
 
       
