@@ -4,32 +4,30 @@ services:
   
   # Golang API
   api:
-    image: "social-media-api:amd64"
+    image: "mock-api:v1"
     build:
       context: ./api
-      dockerfile: Dockerfile.amd64
-      
+      dockerfile: Dockerfile
+      args:
+        - API_ARCH
+        - API_ALPINE_VERSION
     restart: always
-
     environment:
-      - API_APP_CONFIG=${API_CONFIG}
-      - API_DB_TYPE=postgres
+      - API_CONFIG
+      - API_DB_TYPE
       - API_DB_HOST=db
       - API_DB_PORT=5432
-      - API_DB_USERNAME=${DB_USERNAME}
-      - API_DB_PASSWORD=${DB_PASSWORD}
-      - API_DB_NAME=${DB_DBNAME}
-
+      - API_DB_USERNAME
+      - API_DB_PASSWORD
+      - API_DB_NAME
     networks: 
       - api-db
       - nginx-api
-
     depends_on:
       db:
         condition: service_healthy
-
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/social-media-api/v1/instagram/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/mock-api/v1/mock/healthz"]
       start_period: 20s
       interval: 10s
       timeout: 5s
@@ -39,61 +37,46 @@ services:
   db:
     image: postgres:alpine
     restart: always
-    
+    environment: 
+      - POSTGRES_USER=${API_DB_USERNAME}
+      - POSTGRES_PASSWORD=${API_DB_PASSWORD}
+      - POSTGRES_DB=${API_DB_DBNAME} 
     networks:
       - api-db
-
-    environment: 
-      - POSTGRES_USER=${DB_USERNAME}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_DBNAME} 
-
     # Comment out ports here if you do not want outside DB access
     ports:
       - ${DB_OUT_PORT}:5432
-
     # Uncomment the following lines if you want to persist data
-    #volumes:
-    #  - ./db/data:/var/lib/postgresql/data/
-
+    volumes:
+      - ./db/data:/var/lib/postgresql/data/
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DBNAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${API_DB_USERNAME} -d ${API_DB_DBNAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   # Nginx Reverse Proxy
   nginx:
-    image: "social-media-nginx:amd64"
+    image: "mock-nginx:amd64"
     build:
       context: ./nginx
-
-    command: sh -c "nginx -g 'daemon off;'"
-    
     restart: always
-
     ports:
       - ${NGINX_OUT_PORT}:8000
-
     networks:
       - nginx-api
-
     depends_on:
       api:
         condition: service_started
       db:
         condition: service_healthy
-
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/social-media-api/v1/instagram/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/mock-api/v1/mock/healthz"]
       start_period: 20s
       interval: 10s
       timeout: 5s
       retries: 5
 
-
 networks:
   api-db:
-    driver: bridge
   nginx-api:
-    driver: bridge

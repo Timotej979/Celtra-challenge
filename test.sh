@@ -4,8 +4,8 @@
 timeout=300  # Adjust the timeout value as needed
 
 # Start the services
-docker-compose -f docker-compose.amd64.yml build
-docker-compose -f docker-compose.amd64.yml up -d
+docker compose build
+docker compose up -d
 
 # Function to check if a service is healthy
 is_service_healthy() {

@@ -54,7 +54,7 @@ func GetEnvVars() (*EnvVarStore, error) {
 
 	// Extract the string values from the command
 	vars := &EnvVarStore{
-		AppConfig:  cmd.Flag("app-config").Value.String(),
+		AppConfig:  cmd.Flag("config").Value.String(),
 		DbType:     cmd.Flag("db-type").Value.String(),
 		DbUsername: cmd.Flag("db-username").Value.String(),
 		DbPassword: cmd.Flag("db-password").Value.String(),
@@ -95,7 +95,7 @@ func NewRootCommand() *cobra.Command {
 			out := cmd.OutOrStdout()
 
 			// Print the final resolved value from binding cobra flags and viper config
-			fmt.Fprintf(out, "AppConfig: %s\n", variables.AppConfig)
+			fmt.Fprintf(out, "Config: %s\n", variables.AppConfig)
 			fmt.Fprintf(out, "DbType: %s\n", variables.DbType)
 			fmt.Fprintf(out, "DbHost: %s\n", variables.DbHost)
 			fmt.Fprintf(out, "DbPort: %d\n", variables.DbPort)
@@ -107,7 +107,7 @@ func NewRootCommand() *cobra.Command {
 	}
 
 	// Define cobra flags, the default value has the lowest (least significant) precedence
-	rootCmd.Flags().StringVarP(&variables.AppConfig, "app-config", "c", "dev", "The application configuration")
+	rootCmd.Flags().StringVarP(&variables.AppConfig, "config", "c", "dev", "The application configuration")
 	rootCmd.Flags().StringVarP(&variables.DbType, "db-type", "t", "postgres", "The database type")
 	rootCmd.Flags().StringVarP(&variables.DbHost, "db-host", "H", "localhost", "The database host")
 	rootCmd.Flags().IntVarP(&variables.DbPort, "db-port", "P", 5432, "The database port")
